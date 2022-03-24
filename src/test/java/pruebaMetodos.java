@@ -15,6 +15,7 @@ public class pruebaMetodos {
 
     List<Pokemon> pokemons = new ArrayList<>();
     List<Entrenador> entrenadores = new ArrayList<>();
+    List<Movimiento> movimientos = new ArrayList<>();
 
 
     @Before
@@ -55,7 +56,14 @@ public class pruebaMetodos {
         Entrenador e2 = new Entrenador(1,"Misty", "", LocalDate.now()
                 ,new ArrayList<>(List.of(TipoPokemon.AGUA)) , new ArrayList<>());
         Entrenador e3 = new Entrenador(1,"Polo", "", LocalDate.now()
-                ,new ArrayList<>(List.of(TipoPokemon.FUEGO)) , new ArrayList<>());
+                ,new ArrayList<>(List.of(TipoPokemon.FUEGO,TipoPokemon.AGUA)) , new ArrayList<>());
+
+        //---------------------- MOVIMIENTO -----------------------------------------
+        Movimiento m1 = new Movimiento(1,"Lanzallamas", TipoPokemon.FUEGO, TipoAtaque.ESPECIAL, 80 );
+        Movimiento m2 = new Movimiento(1,"Bola Sombra", TipoPokemon.FANTASMA, TipoAtaque.ESPECIAL, 90 );
+        Movimiento m3 = new Movimiento(1,"Pistola Agua", TipoPokemon.AGUA, TipoAtaque.ESPECIAL, 40 );
+        Movimiento m4 = new Movimiento(1,"Terremoto", TipoPokemon.TIERRA, TipoAtaque.ESPECIAL, 100 );
+
 
 
 
@@ -63,6 +71,7 @@ public class pruebaMetodos {
         LineaEvolutiva l1 = new LineaEvolutiva(p4,5,1);
         LineaEvolutiva l2 = new LineaEvolutiva(p5,16,2);
         LineaEvolutiva l3 = new LineaEvolutiva(p6,32,3);
+
         List<LineaEvolutiva> lineaEvolutivasMudkid = new ArrayList<>();
         lineaEvolutivasMudkid.add(l1);
         lineaEvolutivasMudkid.add(l2);
@@ -71,6 +80,7 @@ public class pruebaMetodos {
 
         entrenadores.addAll(List.of(e1,e2,e3));
         pokemons.addAll(List.of(p1,p2,p3,p4,p5,p6,p7,p8));
+        movimientos.addAll(List.of(m1,m2,m3,m4));
 
 
 
@@ -198,15 +208,45 @@ public class pruebaMetodos {
         Pokemon pokemon3 = pokemons.get(3); //Mudkid3
         pokemon3.setNivel(38);
         assertTrue(UtilidadesCombate.puedeEvolucionar(pokemon3));
+    }
 
+    @Test
+    public void testMovimientosQuePuedeAprender(){
+        Pokemon pokemon = pokemons.get(5);
+        List<Movimiento> movimientosAprender = UtilidadesPokemon.movimientosQuePuedeAprender(pokemon, movimientos);
+        Integer cantidadEsperada = 2;
+        Integer cantidadObtenida = movimientosAprender.size();
+        assertEquals(cantidadEsperada,cantidadObtenida);
+    }
 
-
-
-
-
+    @Test
+    public void testEvolucionPosible() {
+        Pokemon pokemon = pokemons.get(3);//Mudkid1
+        pokemon.setNivel(5);
+        Pokemon pokemonEsperado1 = null;
+        Pokemon pokemonObtenido1 = UtilidadesCombate.obtenerEvolucionPosible(pokemon);
+        assertEquals(pokemonEsperado1,pokemonObtenido1);
+        pokemon.setNivel(16);
+        Pokemon pokemonObtenido2 = UtilidadesCombate.obtenerEvolucionPosible(pokemon);
+        Pokemon pokemonEsperado2 = pokemons.get(4);//Marshtomp
+        assertEquals(pokemonEsperado2,pokemonObtenido2);
     }
 
 
+    @Test
+    public void testAsignarEquipoPorTipos(){
+        List<Entrenador> entrenadors = entrenadores;
+        Map<Entrenador,Integer> tamanyos = UtilidadesCombate.asignarEquipoPorTipos(pokemons, entrenadors);
+        Integer puntuacionEsperadaEntrenador1 = 4;
+        Integer puntuacionObtenidaEntrenador1 = tamanyos.get(entrenadors.stream().filter(e-> e.getNombre().equals("Ash")).findFirst().get());
+        Integer puntuacionEsperadaEntrenador2 = 2;
+        Integer puntuacionObtenidaEntrenador2 = tamanyos.get(entrenadors.stream().filter(e-> e.getNombre().equals("Misty")).findFirst().get());
+        Integer puntuacionEsperadaEntrenador3 = 2;
+        Integer puntuacionObtenidaEntrenador3 = tamanyos.get(entrenadors.stream().filter(e-> e.getNombre().equals("Polo")).findFirst().get());
+        assertEquals(puntuacionEsperadaEntrenador1,puntuacionObtenidaEntrenador1);
+        assertEquals(puntuacionEsperadaEntrenador2,puntuacionObtenidaEntrenador2);
+        assertEquals(puntuacionEsperadaEntrenador3,puntuacionObtenidaEntrenador3);
+    }
 
 
 
