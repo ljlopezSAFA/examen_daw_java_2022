@@ -1,6 +1,7 @@
 package modelos;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ public class Entrenador {
     private String apellidos;
     private LocalDate fechaNacimiento;
     private List<TipoPokemon> tiposPreferidos;
-    private List<Pokemon> equipoPokemon;
+    private List<Pokemon> equipoPokemon = new ArrayList<>();
 
     public Entrenador(int id, String nombre, String apellidos, LocalDate fechaNacimiento, List<TipoPokemon> tiposPreferidos, List<Pokemon> equipoPokemon) {
         this.id = id;
