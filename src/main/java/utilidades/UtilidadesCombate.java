@@ -7,16 +7,65 @@ import java.util.stream.Collectors;
 
 public class UtilidadesCombate {
 
-private  static  Integer getPuntosEntrenador(Entrenador e){
+//    private  static  Integer getPuntosEntrenador(Entrenador e){
+//
+//        int puntos = 0;
+//        return puntos;
+//    }
 
-        int puntos = 0;
-        return puntos;
-    }
 
-    public static Map<Entrenador, Integer>   repartirPokemon(List<Entrenador> entrenadores, List<Pokemon> pokemon){
 
+    public static Map<Entrenador, Integer>  repartirPokemon(List<Entrenador> entrenadores, List<Pokemon> pokemon){
 
         Map<Entrenador, Integer>  puntosEntrenadores = new HashMap<>();
+
+        //pokemon = 8
+        //entrenadores = 4
+
+
+
+
+        if(pokemon.size() % entrenadores.size() == 0){
+
+            int cuantosPorEntrenador = pokemon.size() / entrenadores.size();
+
+
+            for(Entrenador e: entrenadores){
+                e.getEquipoPokemon().addAll(pokemon.subList(0,cuantosPorEntrenador));
+                pokemon.removeAll(pokemon.subList(0,cuantosPorEntrenador));
+//                while(e.getEquipoPokemon().size() != 2){
+//                    e.getEquipoPokemon().add(pokemon.get(0));
+//                    pokemon.remove(pokemon.get(0));
+//                }
+            }
+
+
+
+
+            for(Entrenador e:entrenadores){
+
+                List<TipoPokemon> favoritos = new ArrayList<>(e.getTiposPreferidos());
+
+                int puntos = 0;
+
+                for(Pokemon p: e.getEquipoPokemon()){
+
+                    List<TipoPokemon> tiposQueCoinciden = new ArrayList<>(p.getTipos());
+                    tiposQueCoinciden.retainAll(favoritos);
+
+
+                    puntos += tiposQueCoinciden.size();
+
+                }
+
+                puntosEntrenadores.put(e, puntos);
+
+            }
+
+
+        }
+
+
         return puntosEntrenadores;
     }
 
@@ -24,8 +73,16 @@ private  static  Integer getPuntosEntrenador(Entrenador e){
 
 
 
-
     public static void subirAlNivel(Pokemon pokemon , Integer nivel){
+
+        pokemon.setNivel(nivel);
+
+        pokemon.getStats().setAt(pokemon.getStats().getAt() + 2 * nivel);
+        pokemon.getStats().setDf(pokemon.getStats().getDf() + 2 * nivel);
+        pokemon.getStats().setPs(pokemon.getStats().getPs() + 2 * nivel);
+        pokemon.getStats().setSpa(pokemon.getStats().getSpa() + 2 * nivel);
+        pokemon.getStats().setSpdf(pokemon.getStats().getSpdf() + 2 * nivel);
+        pokemon.getStats().setSpd(pokemon.getStats().getSpd() + 2 * nivel);
     }
 
 
@@ -39,10 +96,19 @@ private  static  Integer getPuntosEntrenador(Entrenador e){
      */
     public static boolean puedeEvolucionar1(Pokemon pokemon){
 
-  
-        boolean puedeEvolucionar = false;
+        Integer orden = pokemon.getLineaEvolutiva()
+                .stream()
+                .filter(l-> l.getPokemon().equals(pokemon))
+                .findFirst()
+                .get()
+                .getOrden() ;
 
-        return puedeEvolucionar;
+
+        LineaEvolutiva lineaEvolutivaSiguiente = pokemon.getLineaEvolutiva()
+                .stream().filter(l-> l.getOrden() == orden+1).findFirst().orElse(null);
+
+
+        return lineaEvolutivaSiguiente!=null && pokemon.getNivel() >= lineaEvolutivaSiguiente.getNivelParaEvolucionar();
 
     }
 
@@ -57,8 +123,37 @@ private  static  Integer getPuntosEntrenador(Entrenador e){
      */
     public static boolean puedeEvolucionar(Pokemon pokemon){
 
-        return false;
+        Integer orden = 0;
+
+        for(LineaEvolutiva l : pokemon.getLineaEvolutiva()){
+            if(l.getPokemon().equals(pokemon)){
+                orden = l.getOrden();
+            }
+        }
+
+//        boolean hayAlgunaLineaEvolutivaConOrdenSuperior = false;
+//
+//
+//        List<LineaEvolutiva> lineas = new ArrayList<>(pokemon.getLineaEvolutiva());
+
+        LineaEvolutiva siguienteLinea = null;
+        //SIGUIENTE
+        for(LineaEvolutiva l: pokemon.getLineaEvolutiva()){
+            if(l.getOrden() == orden+1){
+                siguienteLinea = l;
+                break;
+            }
+        }
+
+
+        return siguienteLinea!= null && pokemon.getNivel() >= siguienteLinea.getNivelParaEvolucionar();
     }
+
+
+
+
+
+
 
 
     /**
